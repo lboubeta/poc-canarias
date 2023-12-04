@@ -1,0 +1,11 @@
+---
+
+- name: Deploy new config file
+  ansible.builtin.template:
+    src: linux.config.j2
+    dest: /tmp/{{ ansible_hostname }}.cfg
+    owner: lboubeta
+    group: lboubeta
+    mode: "0755"
+    # validate: /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+    backup: false

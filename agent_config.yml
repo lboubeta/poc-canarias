@@ -1,0 +1,9 @@
+---
+
+- hosts: all
+  become: true
+  roles:
+    - name: nagios-agent
+      vars: 
+        - agent: "{{ host }}"
+          action: "agent"

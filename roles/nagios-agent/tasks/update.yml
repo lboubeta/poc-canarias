@@ -1,0 +1,62 @@
+---
+- name: Update nagios package in Windoes machines
+  when: ansible_os_family != "windows"
+  block:
+    - name: Copy nagios rpm file from server
+      ansible.builtin.copy:
+        src: files/{{ nagios_agent_rpm_file }}
+        dest: /root/{{ nagios_agent_rpm_file }}
+        owner: "root"
+        group: "root"
+        mode: "0755"
+
+    - name: Stop nagios service
+      ansible.builtin.service:
+        name: "{{ nagios_agent_linux_service }}"
+        state: stopped
+
+    - name: Update nagios rpm package
+      ansible.builtin.yum:
+        name: "{{ item }}"
+        disable_gpg_check: true
+        state: present
+      loop:
+        - "{{ nagios_agent_rpm_file }}"
+        - "{{ nagios_extra_packages }}"
+      when: ansible_os_dist == "el8"
+
+    - name: Update nagios rpm package
+      community.general.zypper:
+        name: "{{ item }}"
+        disable_gpg_check: true
+        state: present
+      loop:
+        - "{{ nagios_agent_rpm_file }}"
+        - "{{ nagios_extra_packages }}"
+      when: ansible_os_dist == "sle15"
+
+    - name: Start nagios service
+      ansible.builtin.service:
+        name: "{{ nagios_agent_linux_service }}"
+        state: started
+      ignore_errors: true
+
+
+# - name: Update nagios package in Windoes machines
+#   when: ansible_os_family == windows
+#   block:
+#     - name: Stop nagios windows service
+#       ansible.windows.win_service:
+#         name: "{{ nagios_agent_win_service }}"
+#         state: stopped
+
+#     - name: Install windows nagios package with chocolatey
+#       chocolatey.chocolatey.win_chocolatey:
+#         name: nagios
+#         force: true
+#         version: 2.4.1
+
+#     - name: Start nagios windows service
+#       ansible.windows.win_service:
+#         name: "{{ nagios_agent_win_service }}"
+#         state: started

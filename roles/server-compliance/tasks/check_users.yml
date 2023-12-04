@@ -1,0 +1,11 @@
+---
+
+- name: Check if users exists
+  ansible.builtin.user:
+    name: 
+    uid:
+    group: 
+    groups:
+      - 
+    home: 
+    state: 

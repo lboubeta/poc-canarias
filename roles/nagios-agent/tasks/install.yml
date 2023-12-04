@@ -1,0 +1,22 @@
+---
+
+- name: Install repository from rpm url
+  ansible.builtin.package:
+    name: "{{ nagios-agent_repo_rpm }}"
+    state: present
+
+- name: Install nagios agent
+  ansible.builtin.package:
+    name: "{{item}}"
+    state: present
+  loop:
+    - ncpa
+    - ncpa-plugins  
+
+- name: Create config file with template
+  ansible.builtin.template:
+    src: nagios-agent.cfg.j2
+    dest: /etc/nagios/nagios.cfg
+  handlers:
+    - reload_agent
+  

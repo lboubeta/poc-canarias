@@ -1,0 +1,133 @@
+---
+
+#
+# Pre-tasks for the database instalation
+#
+
+- name: Install prerequisites
+  block:
+    - name: Enable postgres yum repository
+      ansible.builtin.yum_repository:
+        name: postgresql
+        description: PostgreSQL repo
+        file: postgresql
+        baseurl:
+          https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+        gpgkey: https://download.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG-redhat-release
+        gpgcheck: true
+        enabled: true
+
+    - name: Install auxiliar packages
+      ansible.builtin.yum:
+        list:
+          - vim
+          - mlocate
+          - htop
+          - atop
+          - iotop
+          - bc
+
+    - name: Mount required filesystems in RHEL8
+      ansible.posix.mount:
+        src: "{{ item.src }}"
+        path: "{{ item.path }}"
+        fstype: "{{ item.fstype }}"
+        state: mounted
+      loop:
+        - src: /dev/sdb
+          path: "{{ pg_data }}"
+          fstype: ext4
+        - src: /dev/sdc
+          path: "{{ pg_bkp }}"
+          fstype: ext4
+
+    - name: Copy server certificate to RHEL8 server
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ cert_dir }}/{{ item }}"
+        owner: root
+        group: 701
+        mode: "0640"
+      loop:
+        - "{{ server_certificate }}"
+        - "{{ ca_certificate }}"
+
+    - name: Add ca-cert to ldap.conf
+      ansible.builtin.lineinfile:
+        path: "/etc/openldap/ldap.conf"
+        line: "TLS_CACERT {{ cert_dir }}/{{ ca_certificate }}"
+        state: present
+
+    - name: Create postgresql Group
+      ansible.builtin.group:
+        name: postgres
+        state: present
+        gid: 701
+
+    - name: Create postgresql User
+      ansible.builtin.user:
+        name: postgres
+        uid: 7001
+        group: postgres
+        home: "/var/lib/pgsql"
+        state: present
+        comment: "PostgreSQL Server"
+
+    - name: Remove directories from previous instalations
+      ansible.builtin.file:
+        path: "{{ item }}/pgdata"
+        state: absent
+      loop:
+        - "{{ pg_data }}"
+        - "{{ pg_bkp }}"
+
+#
+# Steps to install the database
+#
+
+- name: Kernel tunning overcommit
+  ansible.posix.sysctl:
+    name: "vm.overcommit_memory"
+    value: "2"
+    state: present
+
+- name: Install postgresql server
+  ansible.builtin.package:
+    name:
+      - postgresql{{ pg_version }}
+      - postgresql{{ pg_version }}-server
+      - postgresql{{ pg_version }}-libs
+      - postgresql{{ pg_version }}-contrib
+      - postgresql{{ pg_version }}-devel
+    state: present
+
+- name: Copy postgresql config files with template
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: postgres
+    group: postgres
+    mode: 416
+    backup: true
+  loop:
+    - src: ../templates/postgresql.conf.j2
+      dest: /var/lib/pgsql/postgresql.conf
+    - src: ../templates/.pgsql_profile.j2
+      dest: /var/lib/pgsql/.pgsql_profile
+    - src: ../templates/pg_hba.conf.j2
+      dest: /var/lib/pgsql/pg_hba.conf
+
+#
+# Post-install tasks
+#
+
+- name: Run postgres script into database
+  community.postgresql.postgresql_script:
+    db: "{{ pg_db }}"
+    path: /tmp/script.sql
+
+- name: Enable postgresql service
+  ansible.builtin.service:
+    name: postgresql
+    state: started
+    enabled: true

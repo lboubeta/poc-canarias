@@ -1,0 +1,9 @@
+{% for role in pg_roles %}
+CREATE ROLE "{{ role }}" LOGIN REPLICATION;
+{% endfor %}
+{% for user in pg_users %}
+CREATE USER "{{ user }}" WITH LOGIN SUPERUSER;
+{% endfor %}
+GRANT SELECT ON pg_stat_activity to "_role1_";
+GRANT SELECT ON pg_stat_database to "_role1_";
+GRANT EXECUTE ON function version() to "_role1_";

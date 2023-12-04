@@ -1,0 +1,69 @@
+#Parámetros añadidos por script de GobCan
+#########################################
+
+listen_addresses = '*'
+port = {{ env }}.{{ pg_port }}
+
+unix_socket_group = 'postgres'
+unix_socket_permissions = 0700
+
+# 25% de la memoria total en shared buffers
+{# memoria=$(bc -l <<< "scale=0;$(grep MemTotal /proc/meminfo | awk '{print $2}')/4/1024")
+shared_buffers = $memoria""MB #}
+memoria={{ ansible_memtotal_mb | float * 0.25 }}
+shared_buffers="{{ ansible_memtotal_mb }}MB"
+
+
+maintenance_work_mem = 512MB
+autovacuum_max_workers = 6
+
+# tuneo para evitar las desconexiones de red
+tcp_keepalives_idle = 60
+tcp_keepalives_interval = 10
+tcp_keepalives_count = 3
+
+
+{# rm -fR /{{ pg_data }}/pgdata/{{ pg_cluster }}/log #}
+
+# añadimos opciones de logeo
+log_directory = 'pg_log'
+log_destination = 'stderr,syslog'
+log_error_verbosity = verbose
+log_line_prefix = '%t:%r:%u@%d:[%p]:'
+syslog_facility = 'LOCAL6'
+log_min_duration_statement = 60000
+log_lock_waits = on
+log_filename = 'postgresql-%a.log'
+log_truncate_on_rotation  = on
+
+{% if core 
+# archivado : solo en CORE
+
+wal_level = replica
+wal_keep_size = 1600
+
+archive_mode = on
+archive_command = 'test ! -f {{ pg_bkp }}/copias/{{ pg_cluster }}/arch/%f && cp -pr {{ pg_data }}/pgdata/{{ pg_cluster }}/pg_wal/%f {{ pg_bkp }}/copias/{{ pg_cluster }}/arch/%f'
+%}
+
+{# mkdir -p {{ pg_bkp }}/copias/$CLUSTER/arch/
+mkdir {{ pg_bkp }}/copias/log/
+chown -Rv postgres:postgres {{ pg_bkp }} #}
+
+# ssl
+
+ssl = on
+ssl_ca_file = '{{ cert_dir }}/{{ ca_certificate }}'
+ssl_cert_file = '{{ cert_dir }}/{{ ansible_hostname }}.pem'
+ssl_key_file = '{{ cert_dir }}/{{ ansible_hostname }}.pem'
+ssl_ciphers = 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1405:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384'
+ssl_min_protocol_version = 'TLSv1.2'
+
+{% if core 
+# pmm - solo en core
+
+shared_preload_libraries = 'pg_stat_statements'
+track_activity_query_size = 2048 
+pg_stat_statements.track = all   
+track_io_timing = on
+%}

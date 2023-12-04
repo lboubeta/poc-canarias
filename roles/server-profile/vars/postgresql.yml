@@ -1,0 +1,23 @@
+---
+
+core: false
+pg_cluster: ""
+pg_version: "16"
+pg_data: "_PG_DATA_FS_"
+pg_bkp: "_PG_BKP_FS_"
+pre:
+  pg_port: "{{ 7300 | random(start=7200) }}"
+  ldap_server: "_LDAP_PRE_NAME_"
+  ldap_port: "_LDAP_PRE_PORT_"
+pro:
+  pg_port: "{{ 7500 | random(start=7300) }}"
+  ldap_server: "_LDAP_PRO_NAME_"
+  ldap_port: "_LDAP_PRO_PORT_"
+pg_users:
+  - _user1_
+  - _user2_
+  - _user3_
+pg_roles:
+  - _role1_
+  - _role2_
+  - _role3_

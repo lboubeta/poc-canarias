@@ -1,0 +1,11 @@
+---
+# defaults file for nagios-agent
+
+nagios_agent_rpm_file: ncpa-2.4.1.{{ ansible_os_dist }}.x86_64.rpm
+nagios_agent_linux_service: ncpa_listener
+nagios_agent_repo_rpm: "https://repo.nagios.com/nagios/9/nagios-repo-9-1.el9.noarch.rpm"
+nagios_extra_packages: ''
+win_ee_url: "quay.io/acme_corp/windows-ee:latest"
+
+# Windows vars
+nagios_agent_win_service: nagios-agent

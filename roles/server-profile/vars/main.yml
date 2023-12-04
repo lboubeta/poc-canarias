@@ -1,0 +1,5 @@
+---
+# vars file for server-profile
+
+cert_dir: "/etc/pki/tls/certs"
+ca_certificate: "_CA_FILE_"

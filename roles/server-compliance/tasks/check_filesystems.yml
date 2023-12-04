@@ -1,0 +1,16 @@
+---
+
+- name: Check filesystem mounted
+  community.general.filesystem:
+    dev: 
+    state: present
+    fstype: ext4
+
+- name: Check filesystems permissions
+  ansible.builtin.file:
+    path: 
+    owner: 
+    group: 
+    mode:
+    state: directory
+    recurse: true

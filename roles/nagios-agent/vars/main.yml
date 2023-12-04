@@ -1,0 +1,5 @@
+---
+# vars file for nagios-agent
+
+nagios_config_dir: /usr/local/nagios/etc
+nagios_backup_dir: /usr/local/nagios/etc/backup

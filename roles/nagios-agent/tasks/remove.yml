@@ -1,0 +1,10 @@
+---
+
+- name: Remove nagios package rpm
+  become: true
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - ncpa-agent
+    - ncpa-plugins

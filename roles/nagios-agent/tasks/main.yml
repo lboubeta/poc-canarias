@@ -1,0 +1,21 @@
+---
+
+- name: Update nagios agent
+  ansible.builtin.include_tasks:
+    file: update.yml
+  when: action == "update"
+
+- name: Install nagios agent
+  ansible.builtin.include_tasks:
+    file: install.yml
+  when: action == "install"
+
+- name: Config nagios services
+  ansible.builtin.include_tasks:
+    file: server-config.yml
+  when: action == "config"
+
+- name: Create agent config
+  ansible.builtin.import_tasks:
+    file: agent-config.yml
+  when: action == "agent"
