@@ -42,21 +42,46 @@
       ignore_errors: true
 
 
-# - name: Update nagios package in Windoes machines
-#   when: ansible_os_family == windows
-#   block:
-#     - name: Stop nagios windows service
-#       ansible.windows.win_service:
-#         name: "{{ nagios_agent_win_service }}"
-#         state: stopped
+- name: Update nagios package in Windoes machines
+  when: ansible_os_family == windows
+  block:
+    - name: Ensure nfs is mounted
+      community.windows.win_mapped_drive:
+        letter: Z
+        path: "{{ nfs_share_drive }}"
+        state: present
+        username: "{{ nfs_user }}"
+        password: "{{ nfs_pass }}"
 
-#     - name: Install windows nagios package with chocolatey
-#       chocolatey.chocolatey.win_chocolatey:
-#         name: nagios
-#         force: true
-#         version: 2.4.1
+    - name: Install windows nagios package
+      ansible.windows.win_package:
+        path: "Z:\ansible\ncpa-2.4.1.exe"
+        state: present
+        arguments:
+          - /S
 
-#     - name: Start nagios windows service
-#       ansible.windows.win_service:
-#         name: "{{ nagios_agent_win_service }}"
-#         state: started
+    - name: Edit line in config file
+      community.windows.win_lineinfile:
+        path: "{{ nagios_agent_win_config_file }}"
+        line: "{{ item.new }}"
+        regex: "{{ item.old }}"
+        state: present
+      loop:
+        - new: "community_string = {{ nagios_win_community_string }}"
+          old: "community_string = .*"
+        - new: "plugin_path = C:\\scripts\\"
+          old: "plugin_path .*"
+        - new: "allowed_hosts = {{ nagios_server_host_list | join(',') }}"
+          old: "allowed_hosts .*"
+        - new: ".ps1 = c:\\windows\\sysnative\\windowspowershell\\v1.0\\powershell.exe -ExecutionPolicy Unrestricted -File $plugin_name $plugin_args"
+          old: "#.ps1.*"
+
+    - name: Start nagios windows service
+      ansible.windows.win_service:
+        name: "{{ nagios_agent_win_service }}"
+        state: started
+
+    - name: Stop old nagios windows service
+      ansible.windows.win_service:
+        name: "{{ nagios_agent_win_service }}"
+        state: stopped

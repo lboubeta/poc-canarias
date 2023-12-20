@@ -4,3 +4,11 @@ nagios
 
 [linux-agents]
 
+[win-agents]
+13.80.23.245
+
+[win-agents:vars]
+ansible_connection=winrm
+ansible_port=5986
+ansible_winrm_transport=ntlm
+ansible_winrm_server_cert_validation=ignore

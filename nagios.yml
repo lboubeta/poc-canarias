@@ -1,5 +1,32 @@
 ---
 
-- hosts: server
-  roles:
-    - name: nagios-server
+- hosts: win-agents
+  vars:
+    nagios_agent_win_config_file: "C:\Program Files (x86)\Nagios\NCPA\etc\ncpa.cfg"
+    nagios_server_host_list:
+      - 10.1.1.10
+      - 10.1.1.11
+    nagios_win_community_string: "ed89es8ev"
+  tasks:
+    - name: Install windows nagios package
+      ansible.windows.win_package:
+        path: "C:\\Users\\ansible\\Downloads\\ncpa-2.4.1.exe"
+        state: present
+        arguments:
+          - /S
+
+    - name: Edit line in config file
+      community.windows.win_lineinfile:
+        path: "{{ nagios_agent_win_config_file }}"
+        line: "{{ item.new }}"
+        regex: "{{ item.old }}"
+        state: present
+      loop:
+        - new: "community_string = {{ nagios_win_community_string }}"
+          old: "community_string = .*"
+        - new: "plugin_path = C:\\scripts\\"
+          old: "plugin_path .*"
+        - new: "allowed_hosts = {{ nagios_server_host_list | join(',') }}"
+          old: "allowed_hosts .*"
+        - new: ".ps1 = c:\\windows\\sysnative\\windowspowershell\\v1.0\\powershell.exe -ExecutionPolicy Unrestricted -File $plugin_name $plugin_args"
+          old: ".ps1.*"
