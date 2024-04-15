@@ -3,7 +3,7 @@
 - hosts: all
   vars:
     list_of_groups: "{{ groups }}"
-    list_of_hosts: "{{ list_of_groups|map('extract', groups)|flatten }}"
+    list_of_hosts: "{{ list_of_groups|map('extract', groups)|flatten|unique }}"
   tasks:
 
     - debug:
