@@ -1,9 +1,17 @@
 ---
 
 - hosts: all
+  vars:
+    list_of_hosts: "{{ linux|map('extract', groups)|flatten }}"
   tasks:
     - name: Create list of hosts
       ansible.builtin.file:
         path: /tmp/{{ item }}.txt
-        state: touch
+        state:  touch
       loop: "{{ all_hosts }}"
+
+    - name: Create files from inventory group
+      ansible.builtin.file:
+        path: /tmp/{{ item }}.cfg
+        state: touch
+      loop: "{{ list_of_hosts }}"
