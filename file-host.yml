@@ -16,3 +16,4 @@
         path: /tmp/{{ item }}.cfg
         state: touch
       loop: "{{ list_of_hosts }}"
+      run_once: true
