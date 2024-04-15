@@ -5,6 +5,11 @@
     list_of_groups: "{{ groups.keys() }}"
     list_of_hosts: "{{ list_of_groups|map('extract', groups)|flatten }}"
   tasks:
+    - debug:
+        var: list_of_hosts
+      run_once: true
+
+  
     - name: Create list of hosts
       ansible.builtin.file:
         path: /tmp/{{ item }}.txt
