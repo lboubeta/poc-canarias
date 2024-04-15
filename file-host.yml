@@ -2,7 +2,7 @@
 
 - hosts: all
   vars:
-    list_of_hosts: "{{ linux|map('extract', groups)|flatten }}"
+    list_of_hosts: "{{ 'linux'|map('extract', groups)|flatten }}"
   tasks:
     - name: Create list of hosts
       ansible.builtin.file:
