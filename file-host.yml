@@ -2,9 +2,7 @@
 
 - hosts: all
   vars:
-    list_of_groups: 
-      - linux
-      - windows
+    list_of_groups: "{{ hostvars[item].group_names }}"
     list_of_hosts: "{{ list_of_groups|map('extract', groups)|flatten }}"
   tasks:
     - name: Create list of hosts
