@@ -5,4 +5,5 @@
     - name: Create list of hosts
       ansible.builtin.file:
         path: /tmp/{{ item }}.txt
+        state: present
       loop: "{{ all_hosts }}"
