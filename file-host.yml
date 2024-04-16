@@ -17,4 +17,4 @@
       ansible.builtin.template:
         src: agent.cfg.j2
         dest: /tmp/{{ item }}.cfg
-      loop: "{{ list_of_groups }}"
+      loop: "{{ list_of_hosts }}"
