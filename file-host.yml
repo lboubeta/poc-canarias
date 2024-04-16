@@ -4,6 +4,8 @@
   vars:
     list_of_groups: "{{ groups }}"
     list_of_hosts: "{{ list_of_groups|map('extract', groups)|flatten|unique }}"
+    host_ip: "{{ dict(ansible_play_hosts_all|zip(ansible_play_hosts_all|map('extract', hostvars, 'ansible_host'))) }}"
+    host_ip_list: "{{ host_ip|dict2items(key_name='name',value_name='ip') }}"
   tasks:
 
     - debug:
@@ -12,6 +14,14 @@
       
     - debug:
         var: list_of_hosts
+      run_once: true
+
+    - debug:
+        var: host_ip
+      run_once: true
+
+    - debug:
+        var: host_ip_list
       run_once: true
 
   
