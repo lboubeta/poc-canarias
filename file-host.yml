@@ -4,36 +4,17 @@
   vars:
     list_of_groups: "{{ groups }}"
     list_of_hosts: "{{ list_of_groups|map('extract', groups)|flatten|unique }}"
-    host_ip: "{{ dict(grous|zip(groups|map('extract', hostvars, 'ansible_host'))) }}"
-    host_ip_list: "{{ host_ip|dict2items(key_name='name',value_name='ip') }}"
   tasks:
-
     - debug:
         var: list_of_groups
       run_once: true
-      
+
     - debug:
         var: list_of_hosts
       run_once: true
 
-    - debug:
-        var: host_ip
-      run_once: true
-
-    - debug:
-        var: host_ip_list
-      run_once: true
-
-  
     - name: Create list of hosts
-      ansible.builtin.file:
-        path: /tmp/{{ item }}.txt
-        state:  touch
-      loop: "{{ all_hosts }}"
-
-    - name: Create files from inventory group
-      ansible.builtin.file:
-        path: /tmp/{{ item }}.cfg
-        state: touch
-      loop: "{{ list_of_hosts }}"
-      run_once: true
+      ansible.builtin.template:
+        src: agent.cfg.j2
+        dest: /tmp/{{ item }}.cfg
+      loop: "{{ list_of_groups }}"
