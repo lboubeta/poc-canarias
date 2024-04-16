@@ -2,18 +2,12 @@
 
 - name: Check config
   ansible.builtin.template:
-    src: linux.config.j2
-    dest: "{{ nagios_config_dir }}/ansible/{{ agent }}.cfg"
+    src: agent.config.j2
+    # dest: "{{ nagios_config_dir }}/ansible/{{ ansible_hostname }}.cfg"
+    dest: "/tmp/{{ ansible_hostname }}.cfg"
     owner: nagios
     group: nagios
     mode: "0755"
     backup: true
   register: create_config
-
-# - name: Move old config to backup dir
-#   ansible.builtin.copy:
-#     remote_src: "{{ nagios_config_dir }}/ansible/{{ ansible_hostname }}.cfg.{{ ansible_date_time.date }}@{{ ansible_date_time.time }}*"
-#     dest: "{{ nagios_backup_dir }}/{{ ansible_hostname }}.cfg.bkp_{{ ansible_date_time.date }}-{{ ansible_date_time.time }}"
-#     owner: nagios
-#     group: nagios
-#     mode: "0755"
+  delegate_to: nagios

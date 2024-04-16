@@ -12,9 +12,9 @@
 
 
 define host {
-        host_name                       {{ item }}
+        host_name                       {{ ansible_hostname }}
         alias                           PRE - ANSIBLE
-        address                         {{ hostvars[item]['ansible_facts']['eth0']['ipv4']['address'] }}
+        address                         {{ ansible_ipv4_address }}
         hostgroups                      {{ nagios_server_group }}
         use                             plantilla-host-servidor-new
         register                        1

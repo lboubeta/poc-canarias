@@ -5,5 +5,4 @@
   roles:
     - name: nagios-agent
       vars: 
-        - agent: "{{ host }}"
-          action: "agent"
+        - action: "agent"
