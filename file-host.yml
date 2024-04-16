@@ -17,4 +17,4 @@
       ansible.builtin.template:
         src: agent.cfg.j2
         dest: /tmp/{{ ansible_hostname }}.cfg
-      delegate_to: nagios
+      delegate_to: controller
