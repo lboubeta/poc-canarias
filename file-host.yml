@@ -13,6 +13,9 @@
         var: list_of_hosts
       run_once: true
 
+    - debug:
+        var: hostvars[controller]
+
     - name: Create list of hosts
       ansible.builtin.template:
         src: agent.cfg.j2
