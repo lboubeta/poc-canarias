@@ -14,6 +14,4 @@
         aggregate: true
         per_host: true
         data:
-          stated_hosts:
-            - name: "{{ ansible_hostname }}"
-              ip: "{{ ansible_default_ipv4.address }}"
+          stated_hosts: "hola" 
