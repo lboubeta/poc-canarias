@@ -11,8 +11,9 @@
         var: stated_hosts
 
     - name: Create dictionary with hosts names and ip in a fact
-      ansible.builtin.set_fact:
-        updated_hosts: "{{ updated_hosts + [{'name': ansible_hostname, 'ip': ansible_default_ipv4.address}] }}"
+      ansible.builtin.set_stats:
+        data:
+          updated_hosts: "{{ updated_hosts + [{'name': ansible_hostname, 'ip': ansible_default_ipv4.address}] }}"
 
     - name: Create list with stat
       ansible.builtin.set_stats:
