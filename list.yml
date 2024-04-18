@@ -3,16 +3,18 @@
 - name: Create list of servers to configure Nagios Agent
   hosts: all
   vars:
+    dummy: ""
     updated_hosts: []
-    stated_hosts: []
   tasks:
+    - name: Show list
+      ansible.builtin.debug:
+        var: stated_hosts
+
     - name: Create dictionary with hosts names and ip in a fact
       ansible.builtin.set_fact:
         updated_hosts: "{{ updated_hosts + [{'name': ansible_hostname, 'ip': ansible_default_ipv4.address}] }}"
 
     - name: Create list with stat
       ansible.builtin.set_stats:
-        aggregate: false
-        per_host: false
         data:
-          stated_hosts: "hola" 
+          dummy: "{{ ansible_hostname }}"

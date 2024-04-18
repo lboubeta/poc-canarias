@@ -6,4 +6,7 @@
   tasks:
     - name: Get stated hosts
       ansible.builtin.debug:
-        var: stated_hosts
+        var: "{{ item }}"
+      loop:
+        - updated_hosts
+        - dummy
