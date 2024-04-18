@@ -12,7 +12,7 @@
 
     - name: Create list with stat
       ansible.builtin.set_stats:
-        aggregate: true
-        per_host: true
+        aggregate: false
+        per_host: false
         data:
           stated_hosts: "hola" 
