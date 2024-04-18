@@ -4,6 +4,7 @@
   hosts: all
   vars:
     updated_hosts: []
+    stated_hosts: []
   tasks:
     - name: Create dictionary with hosts names and ip in a fact
       ansible.builtin.set_fact:
