@@ -1,9 +1,0 @@
----
-- hosts: all
-  tasks:
-    - name: Allow the backup user to sudo /usr/local/bin/backup
-      community.general.sudoers:
-        name: allow-backup
-        state: present
-        user: backup
-        commands: /usr/local/bin/backup

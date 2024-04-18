@@ -1,7 +1,9 @@
 ---
 
-- hosts: all
+- name: Debug hosts
+  hosts: all
   gather_facts: true
   tasks:
-    - debug:
-        var: ansible_hostname
+    - name: Get stated hosts
+      ansible.builtin.debug:
+        var: stated_hosts
